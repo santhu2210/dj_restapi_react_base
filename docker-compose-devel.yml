@@ -1,0 +1,38 @@
+version: '3.7'
+services:
+    main_engine:
+        image: "dj_restapi_imge:1.0a1"
+        container_name: "dj_restapi_engine"
+        ports:
+            - "8001:8000"
+        volumes:
+            - ./backend_server:/home/restapi_user/restapi_deployment/backend_server
+        command: /bin/bash /home/restapi_user/restapi_deployment/backend_server/run_devel_server.sh
+        networks:
+            restapi_network:
+                ipv4_address: 192.168.4.2
+        depends_on:
+            - mysql_database
+
+    mysql_database:
+        image: 'mysql/mysql-server:5.7'
+        ports:
+          - "3316:3306"
+        container_name: 'restapi_mysql_container'
+        environment:
+          - MYSQL_ROOT_PASSWORD=root
+          # - MYSQL_DATABASE=restapi_dev
+            # - MYSQL_USER=dbadmin
+            # - MYSQL_PASSWORD=dbadmin123
+        volumes:
+          - ./restapi_datavolume:/var/lib/mysql
+        networks:
+           restapi_network:
+              ipv4_address: 192.168.4.3
+
+networks:
+    restapi_network:
+        ipam:
+            driver: default
+            config:
+                - subnet: 192.168.0.0/16
